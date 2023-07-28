@@ -1,6 +1,6 @@
 # La Cakery Custom Functions Plugin
 
-The La Cakery Custom Functions plugin enhances the functionality of the La Cakery website, providing a personalized and delightful experience for customers. Here's an overview of what this plugin does and how to use it:
+The La Cakery Custom Functions plugin is a custom WordPress plugin designed specifically for the La Cakery website. This plugin provides several custom functionalities tailored to enhance the website's functionality and user experience. Below is a detailed description of each feature and how they contribute to the overall website:
 
 ## Table of Contents
 
