@@ -63,6 +63,33 @@ jQuery(document).ready(function ($) {
     }
   });
 
+  // Function to check and display the notice
+  function checkInputLengthAgainstLimit() {
+    var selectedOption = $("#pa_size option:selected");
+    var variation = selectedOption.text().trim();
+    var inputText = textField.val();
+    var inputLength = inputText.length;
+
+    // Display notice if necessary
+    if (variation && inputLength > sizeLimits[variation]) {
+      $(".notice")
+        .text(
+          "Maximum character limit exceeded! Please reduce the message length."
+        )
+        .show();
+      $("#add_to_cart_button_id").prop("disabled", true); // Disable the add to cart button. Note: You need to use the correct ID or class for your Add to Cart button.
+    } else {
+      $(".notice").hide();
+      $("#add_to_cart_button_id").prop("disabled", false); // Enable the add to cart button.
+    }
+  }
+
+  // Call the above function when size dropdown changes
+  $("#pa_size").on("change", function () {
+    toggleCustomMessageField();
+    checkInputLengthAgainstLimit();
+  });
+
   // Set the default character limit
   textField.attr("maxlength", defaultLimit);
 });
