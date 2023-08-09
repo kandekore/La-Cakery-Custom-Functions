@@ -1,5 +1,5 @@
-jQuery(document).ready(function($) {
-  var textField = $('#custom_message');
+jQuery(document).ready(function ($) {
+  var textField = $("#custom_message");
   var sizeLimits = {
     '6"': 20,
     '8"': 30,
@@ -9,19 +9,18 @@ jQuery(document).ready(function($) {
     '16"': 50,
     '18x30"': 50
   };
-  var defaultLimit = 50;
+  var defaultLimit = 30;
 
   // Function to show/hide the text field based on the selected variation
   function toggleCustomMessageField() {
-    var selectedOption = $('#size option:selected');
+    var selectedOption = $("#pa_size option:selected");
     var variation = selectedOption.text().trim();
 
     if (variation && sizeLimits.hasOwnProperty(variation)) {
       var limit = sizeLimits[variation];
-      textField.parent().show();
-      textField.attr('maxlength', limit);
+      textField.attr("maxlength", limit);
     } else {
-      textField.parent().hide();
+      textField.attr("maxlength", defaultLimit);
     }
   }
 
@@ -29,37 +28,41 @@ jQuery(document).ready(function($) {
   toggleCustomMessageField();
 
   // Listen for changes in the variation select
-  $('#size').on('change', function() {
+  $("#pa_size").on("change", function () {
+    toggleCustomMessageField();
+  });
+
+  $(".variations_form").on("woocommerce_variation_select_change", function () {
     toggleCustomMessageField();
   });
 
   // Prevent typing if no option is selected
- textField.on('keypress', function(e) {
-    var selectedOption = $('#size option:selected');
+  textField.on("keypress", function (e) {
+    var selectedOption = $("#pa_size option:selected");
     var variation = selectedOption.text().trim();
     var inputText = textField.val();
     var inputLength = inputText.length;
-    
-    if (!variation || inputLength >= sizeLimits[variation]) {
+
+    if (inputLength >= (sizeLimits[variation] || defaultLimit)) {
       e.preventDefault();
       return false;
     }
   });
 
   // Display notice when maximum limit is reached
-  textField.on('input', function() {
-    var selectedOption = $('#size option:selected');
+  textField.on("input", function () {
+    var selectedOption = $("#pa_size option:selected");
     var variation = selectedOption.text().trim();
     var inputText = textField.val();
     var inputLength = inputText.length;
-    
+
     if (variation && inputLength >= sizeLimits[variation]) {
-      $('.notice').text('Maximum character limit reached').show();
+      $(".notice").text("Maximum character limit reached").show();
     } else {
-      $('.notice').hide();
+      $(".notice").hide();
     }
   });
 
   // Set the default character limit
-  textField.attr('maxlength', defaultLimit);
+  textField.attr("maxlength", defaultLimit);
 });

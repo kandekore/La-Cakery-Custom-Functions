@@ -66,7 +66,8 @@ function custom_message_settings_page() {
  
  // Enqueue the custom scripts
 function enqueue_custom_scripts() {
-    wp_enqueue_script('custom-script', get_template_directory_uri() . '/js/custom.js', array('jquery'), '1.0', true);
+    wp_enqueue_script('custom-script', plugins_url('/js/custom.js', __FILE__), array('jquery'), '1.0', true);
+
 }
 add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
 
