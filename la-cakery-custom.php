@@ -104,7 +104,7 @@ function add_custom_message_field_to_cart_item_data($cart_item_data, $product_id
 add_filter('woocommerce_add_cart_item_data', 'add_custom_message_field_to_cart_item_data', 10, 3);
 
 // Display custom message field value in cart and checkout
-function display_custom_message_on_cart_and_checkout($item_data, $cart_item) {
+/*function display_custom_message_on_cart_and_checkout($item_data, $cart_item) {
     if (isset($cart_item['custom_message'])) {
         $item_data[] = array(
             'key'     => __('Custom Message', 'woocommerce'),
@@ -114,7 +114,41 @@ function display_custom_message_on_cart_and_checkout($item_data, $cart_item) {
     }
     return $item_data;
 }
-add_filter('woocommerce_get_item_data', 'display_custom_message_on_cart_and_checkout', 10, 2);
+add_filter('woocommerce_get_item_data', 'display_custom_message_on_cart_and_checkout', 10, 2);*/
+
+// Save custom message to order item data
+function save_custom_message_to_order_item_data($item_id, $item, $order_id) {
+    if (isset($item['custom_message'])) {
+        wc_add_order_item_meta($item_id, '_custom_message', sanitize_text_field($item['custom_message']));
+    }
+}
+add_action('woocommerce_add_order_item_meta', 'save_custom_message_to_order_item_data', 10, 3);
+
+// Display custom message in emails
+function display_custom_message_in_email($item_id, $item, $order, $plain_text) {
+    $custom_message = $item->get_meta('_custom_message');
+
+    if ($custom_message) {
+        if (!$plain_text) {
+            echo '<p><strong>Custom Message:</strong> ' . esc_html($custom_message) . '</p>';
+        } else {
+            echo "\nCustom Message: " . $custom_message;
+        }
+    }
+}
+add_action('woocommerce_order_item_meta_end', 'display_custom_message_in_email', 10, 4);
+// Display custom message in cart
+function display_custom_message_in_cart($product_name, $cart_item, $cart_item_key) {
+    if (isset($cart_item['custom_message'])) {
+        $custom_message = $cart_item['custom_message'];
+        $product_name .= '<br><strong>Custom Message:</strong>';
+        $product_name .= '<p>' . esc_html($custom_message) . '</p>';
+    }
+    return $product_name;
+}
+add_filter('woocommerce_cart_item_name', 'display_custom_message_in_cart', 10, 3);
+
+
 
 // Add SKU after product name on shop and archive pages
 function add_sku_after_product_name_on_shop_pages() {
