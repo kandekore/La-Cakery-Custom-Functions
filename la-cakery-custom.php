@@ -2,7 +2,7 @@
 /**
  * Plugin Name: La Cakery Custom Functions
  * Description: Custom functions for La Cakery website.
- * Version: 1.0
+ * Version: 1.1
  * Author: Darren Kandekore
  */
 
@@ -162,16 +162,17 @@ function add_sku_after_product_name_on_shop_pages() {
 
         // Display product name with SKU (if SKU exists)
         if ($sku) {
-            $product_title = $product->get_name() . ' (' . $sku . ')';
+            $product_title = $product->get_name() . '<span style="display: block;">' . esc_html($sku) . '</span>';
         } else {
             $product_title = $product->get_name();
         }
 
         // Output the modified title with SKU
-        echo '<h2 class="woocommerce-loop-product__title with_sku">' . esc_html($product_title) . '</h2>';
+        echo '<h2 class="woocommerce-loop-product__title with_sku">' . $product_title . '</h2>';
     }
 }
 add_action('woocommerce_shop_loop_item_title', 'add_sku_after_product_name_on_shop_pages');
+
 
 
 // Modify product title on single product page
@@ -189,7 +190,7 @@ function add_sku_after_product_name_on_single_product_page($title, $post_id) {
 
             // Append SKU code to the product title (if SKU exists)
             if ($sku) {
-                $title .= ' <span class="product-sku">' . esc_html($sku) . '</span>';
+                $title .= '<br> <span class="product-sku">' . esc_html($sku) . '</span>';
             }
         }
     }
@@ -197,5 +198,49 @@ function add_sku_after_product_name_on_single_product_page($title, $post_id) {
     return $title;
 }
 add_filter('the_title', 'add_sku_after_product_name_on_single_product_page', 10, 2);
+// Limit the quantity of a specific product in the cart to 5
+function limit_product_quantity_in_cart($passed, $product_id, $quantity) {
+    if ($quantity > 5) {
+        $product = wc_get_product($product_id);
+        $product_name = $product->get_name();
+        
+        // Display an error message
+        wc_add_notice("If you'd like to order more than 5 $product_name, please contact us.", 'error');
+        
+        return false; // Prevent the product from being added to the cart
+    }
+    
+    return $passed; // Allow the product to be added to the cart
+}
+add_filter('woocommerce_add_to_cart_validation', 'limit_product_quantity_in_cart', 10, 3);
 
+// Enforce the quantity limit on the cart page
+function enforce_cart_quantity_limit() {
+    global $woocommerce;
+    
+    foreach ($woocommerce->cart->get_cart() as $cart_item_key => $cart_item) {
+        $product_id = $cart_item['product_id'];
+        $quantity = $cart_item['quantity'];
+        
+        if ($quantity > 5) {
+            $woocommerce->cart->set_quantity($cart_item_key, 5);
+            wc_add_notice("If you'd like to order more than 5 of this product, please contact us.", 'error');
+        }
+    }
+}
+add_action('woocommerce_before_cart', 'enforce_cart_quantity_limit');
 
+function custom_variation_price_format($price, $product) {
+    // If product is a variable product
+    if ($product->is_type('variable')) {
+        // Get the minimum variation price
+        $min_price = $product->get_variation_price('min', true);
+
+        // Return the formatted price
+        return 'From ' . wc_price($min_price);
+    }
+
+    // If not a variable product, return the default price
+    return $price;
+}
+add_filter('woocommerce_get_price_html', 'custom_variation_price_format', 10, 2);
