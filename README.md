@@ -67,6 +67,3 @@ With the **Limit Product Quantity in Cart** feature, you can set a maximum quant
 
 The **Custom Variation Price Format** feature modifies the displayed price for variable products. Instead of showing the full price range, the plugin showcases the minimum price with a "From" label, providing clarity to customers.
 
----
-
-By utilizing the La Cakery Custom Functions plugin, you can elevate your website's capabilities and create a more engaging and user-friendly experience for your customers. Each feature is designed to cater to specific needs and requirements, ensuring that your bakery business thrives in the digital landscape.
