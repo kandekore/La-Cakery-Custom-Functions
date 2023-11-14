@@ -244,3 +244,41 @@ function custom_variation_price_format($price, $product) {
     return $price;
 }
 add_filter('woocommerce_get_price_html', 'custom_variation_price_format', 10, 2);
+
+add_action( 'woocommerce_product_query', 'custom_sort_products_by_sku' );
+
+function custom_sort_products_by_sku( $query ) {
+    // Check if on a product category archive page
+    if ( ! is_admin() && is_product_category() && $query->is_main_query() ) {
+        // Set the orderby parameter to 'meta_value' for SKU
+        $query->set( 'orderby', 'meta_value' );
+        // Set the meta key to '_sku' which is the SKU
+        $query->set( 'meta_key', '_sku' );
+        // Set the order parameter to 'ASC' for ascending order
+        $query->set( 'order', 'ASC' );
+    }
+}
+
+// Add the 'Sort by SKU' option to the sorting dropdown
+add_filter( 'woocommerce_catalog_orderby', 'add_sort_by_sku_to_dropdown' );
+function add_sort_by_sku_to_dropdown( $options ) {
+    // Add 'Sort by SKU' option
+    $options['sort_by_sku'] = __('Sort by SKU', 'woocommerce');
+    return $options;
+}
+
+// Handle the sorting logic for 'Sort by SKU'
+add_action( 'woocommerce_product_query', 'sort_products_by_sku' );
+function sort_products_by_sku( $query ) {
+    // Check if 'orderby' is set to 'sort_by_sku'
+    if ( isset( $_GET['orderby'] ) && 'sort_by_sku' === $_GET['orderby'] ) {
+        $query->set( 'orderby', 'meta_value' );
+        $query->set( 'meta_key', '_sku' );
+        $query->set( 'order', 'ASC' );
+    }
+}
+
+// Ensure the 'Sort by SKU' option works correctly with WooCommerce's session handling
+add_filter( 'woocommerce_default_catalog_orderby_options', 'add_sort_by_sku_to_dropdown' );
+add_filter( 'woocommerce_catalog_orderby', 'add_sort_by_sku_to_dropdown' );
+
